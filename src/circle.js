@@ -22,9 +22,14 @@ const CircleShape = ({ shapeProps, isSelected, onSelect, onChange, onRemove }) =
         draggable
         onDragEnd={e => {
           onChange({
+            eventType: e.type,
             ...shapeProps,
             x: e.target.x(),
-            y: e.target.y()
+            y: e.target.y(),
+            previousPosition: {
+              x: shapeProps.x,
+              y: shapeProps.y
+            }
           });
         }}
         onTransformEnd={e => {

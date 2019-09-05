@@ -31,8 +31,6 @@ const LineShape = ({ shapeProps, isSelected, onSelect, onChange, onRemove }) => 
           const node = shapeRef.current;
           if (node.rotation() === shapeProps.rotation) {
             // transformer is changing scale
-            // const scaleX = node.scaleX();
-            // const scaleY = node.scaleY();
             // we will reset it back
             node.scaleX(1);
             node.scaleY(1);

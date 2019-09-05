@@ -5,7 +5,7 @@ import Rectangle from "./rectangle";
 import CircleShape from "./circle";
 import LineShape from "./line";
 
-const Shapes = () => {
+const Shapes = ({ baseImageUrl }) => {
   const [shapes, setShapes] = useState([]);
   const [LineDrawingMode, setLineDrawingMode] = useState(false);
   const [currentLine, setCurrentline] = useState("");
@@ -25,9 +25,7 @@ const Shapes = () => {
     console.log(shapes);
   }, [shapes]);
 
-  const [mainImage] = useImage(
-    "https://www.autocar.co.uk/sites/autocar.co.uk/files/styles/gallery_slide/public/images/car-reviews/first-drives/legacy/large-2479-s-classsaloon.jpg"
-  );
+  const [mainImage] = useImage(baseImageUrl);
 
   const closeButton =
     "https://firebasestorage.googleapis.com/v0/b/data-marketplace-bb1fa.appspot.com/o/staticImages%2Fproject%2Fcancel.svg?alt=media&token=2168342f-b8f6-45f4-baea-0701f74ea927";
@@ -88,8 +86,21 @@ const Shapes = () => {
   };
 
   const addDotsToLine = (x, y) => {
+    const date = Date.now();
+    const dot = {
+      type: "dot",
+      x,
+      y,
+      radius: 5,
+      stroke: "black",
+      fill: "rgba(255,0,0,0.3)",
+      id: "dot" + date
+    };
+
     const _shapes = [...shapes];
     const index = _shapes.findIndex(item => item.id === currentLine);
+    _shapes.push(dot);
+
     if (index !== -1) {
       _shapes[index].points.push(x, y);
       setShapes(_shapes);
@@ -121,7 +132,7 @@ const Shapes = () => {
   };
 
   return (
-    <div style={{ flex: 1, width: "70%", height: "80vh" }} ref={stageParentRef}>
+    <div style={{ flex: 1, width: "100%", height: "80vh" }} ref={stageParentRef}>
       <Stage width={stageSize.w} height={stageSize.h}>
         <Layer>
           <Image
@@ -166,16 +177,8 @@ const Shapes = () => {
                   onRemove={() => removeShape(shape.id)}
                 />
               </Group>
-            ) : shape.type === "circle" ? (
+            ) : shape.type === "circle" || shape.type === "dot" ? (
               <Group key={i}>
-                {/* <Image
-                  image={closeButton}
-                  x={shape.x + shape.radius}
-                  y={shape.y + shape.radius}
-                  width={20}
-                  height={20}
-                  onMouseUp={() => removeShape(shape.id)}
-                /> */}
                 <CircleShape
                   shapeProps={shape}
                   isSelected={shape.id === selectedId}
@@ -183,6 +186,28 @@ const Shapes = () => {
                     selectShape(shape.id);
                   }}
                   onChange={newAttrs => {
+                    console.log(newAttrs);
+                    if (newAttrs.type === "dot" && newAttrs.eventType === "dragend") {
+                      const _shapesArray = [...shapes];
+                      const index = _shapesArray.findIndex(
+                        item =>
+                          item.type === "line" && item.points.includes(newAttrs.previousPosition.x)
+                      );
+                      if (index !== -1) {
+                        const foundPoint = _shapesArray[index];
+                        const xIndex = foundPoint.points.findIndex(
+                          item => item === newAttrs.previousPosition.x
+                        );
+                        if (
+                          xIndex !== -1 &&
+                          foundPoint.points[xIndex + 1] === newAttrs.previousPosition.y
+                        ) {
+                          _shapesArray[index].points[xIndex] = newAttrs.x;
+                          _shapesArray[index].points[xIndex + 1] = newAttrs.y;
+                          setShapes(_shapesArray);
+                        }
+                      }
+                    }
                     const _shapes = shapes.slice();
                     _shapes[i] = newAttrs;
                     setShapes(_shapes);
@@ -193,14 +218,6 @@ const Shapes = () => {
             ) : (
               shape.type === "line" && (
                 <Group key={i}>
-                  {/* <Image
-                    image={closeButton}
-                    x={shape.points[0]}
-                    y={shape.points[1]}
-                    width={20}
-                    height={20}
-                    onMouseUp={() => removeShape(shape.id)}
-                  /> */}
                   <LineShape
                     key={i}
                     shapeProps={shape}
