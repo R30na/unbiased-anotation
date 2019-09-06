@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Stage, Layer, Image, Group } from "react-konva";
 import useImage from "use-image";
-import Rectangle from "./rectangle";
-import CircleShape from "./circle";
-import LineShape from "./line";
+import Rectangle from "./shapes/rectangle";
+import CircleShape from "./shapes/circle";
+import LineShape from "./shapes/line";
 
 const Shapes = ({ baseImageUrl }) => {
   const [shapes, setShapes] = useState([]);
@@ -21,9 +21,10 @@ const Shapes = ({ baseImageUrl }) => {
   }, []);
 
   useEffect(() => {
+    // console.log(stageSize);
     localStorage.setItem("shapes", JSON.stringify(shapes));
-    console.log(shapes);
-  }, [shapes]);
+    // console.log(JSON.stringify(shapes, null, 1));
+  }, [shapes, stageSize]);
 
   const [mainImage] = useImage(baseImageUrl);
 
@@ -49,10 +50,10 @@ const Shapes = ({ baseImageUrl }) => {
     const date = Date.now();
     const rect = {
       type: "rectangle",
-      x: stageSize.w / 2 - 50 - shapes.length * 10,
-      y: stageSize.h / 2 - 50 - shapes.length * 10,
-      width: 100,
-      height: 100,
+      x: stageSize.w / 2 - stageSize.w * 0.1 - shapes.length * 10,
+      y: stageSize.h / 2 - stageSize.h * 0.1 - shapes.length * 10,
+      width: stageSize.w * 0.1,
+      height: stageSize.h * 0.1,
       stroke: "red",
       fill: "rgba(255,0,0,0.3)",
       id: "rect" + date,
@@ -67,12 +68,13 @@ const Shapes = ({ baseImageUrl }) => {
     const date = Date.now();
     const circle = {
       type: "circle",
-      x: stageSize.w / 2 - 50 - shapes.length * 10,
-      y: stageSize.h / 2 - 50 - shapes.length * 10,
-      radius: 50,
+      x: stageSize.w / 2 - stageSize.w * 0.1 - shapes.length * 10,
+      y: stageSize.h / 2 - stageSize.h * 0.1 - shapes.length * 10,
+      radius: stageSize.w * 0.05,
       stroke: "red",
       fill: "rgba(255,0,0,0.3)",
-      id: "circle" + date
+      id: "circle" + date,
+      rotation: 0
     };
     const _shapes = [...shapes];
     _shapes.push(circle);
@@ -89,12 +91,14 @@ const Shapes = ({ baseImageUrl }) => {
     const date = Date.now();
     const dot = {
       type: "dot",
+      radius: 10,
       x,
       y,
-      radius: 5,
       stroke: "black",
       fill: "rgba(255,0,0,0.3)",
-      id: "dot" + date
+      id: "dot" + date,
+      rotation: 0,
+      parentId: currentLine
     };
 
     const _shapes = [...shapes];
@@ -114,25 +118,29 @@ const Shapes = ({ baseImageUrl }) => {
         stroke: "red",
         fill: "rgba(255,0,0,0.3)",
         tension: 0,
-        id: currentLine
+        id: currentLine,
+        rotation: 0
       };
       _shapes.push(line);
       setShapes(_shapes);
     }
-    // console.log(shapes)
   };
 
-  const removeShape = id => {
+  const removeShape = shapeToDelete => {
     const _shapes = [...shapes];
-    const index = _shapes.findIndex(item => item.id === id);
-    if (index !== -1) {
+    const index = _shapes.findIndex(item => item.id === shapeToDelete.id);
+    if (index !== -1 && shapeToDelete.type !== "line") {
       _shapes.splice(index, 1);
       setShapes(_shapes);
+    } else if (index !== -1 && shapeToDelete.type === "line") {
+      _shapes.splice(index, 1);
+      const _filtered = _shapes.filter(item => item.parentId !== shapeToDelete.id);
+      setShapes(_filtered);
     }
   };
 
   return (
-    <div style={{ flex: 1, width: "100%", height: "80vh" }} ref={stageParentRef}>
+    <div style={{ flex: 1, width: "100%", height: "100%" }} ref={stageParentRef}>
       <Stage width={stageSize.w} height={stageSize.h}>
         <Layer>
           <Image
@@ -152,17 +160,6 @@ const Shapes = ({ baseImageUrl }) => {
           {shapes.map((shape, i) =>
             shape.type === "rectangle" ? (
               <Group key={i}>
-                {/* <Image
-                  image={closeButton}
-                  x={shape.x}
-                  y={shape.y}
-                  // offsetX={shape.x}
-                  // offsetY={shape.y}
-                  width={20}
-                  height={20}
-                  rotation={shape.rotation}
-                  onMouseUp={() => removeShape(shape.id)}
-                /> */}
                 <Rectangle
                   shapeProps={shape}
                   isSelected={shape.id === selectedId}
@@ -174,7 +171,7 @@ const Shapes = ({ baseImageUrl }) => {
                     _shapes[i] = newAttrs;
                     setShapes(_shapes);
                   }}
-                  onRemove={() => removeShape(shape.id)}
+                  onRemove={() => removeShape(shape)}
                 />
               </Group>
             ) : shape.type === "circle" || shape.type === "dot" ? (
@@ -183,10 +180,9 @@ const Shapes = ({ baseImageUrl }) => {
                   shapeProps={shape}
                   isSelected={shape.id === selectedId}
                   onSelect={() => {
-                    selectShape(shape.id);
+                    if (shape.type !== "dot") selectShape(shape.id);
                   }}
                   onChange={newAttrs => {
-                    console.log(newAttrs);
                     if (newAttrs.type === "dot" && newAttrs.eventType === "dragend") {
                       const _shapesArray = [...shapes];
                       const index = _shapesArray.findIndex(
@@ -209,10 +205,13 @@ const Shapes = ({ baseImageUrl }) => {
                       }
                     }
                     const _shapes = shapes.slice();
+                    delete newAttrs.previousPosition;
                     _shapes[i] = newAttrs;
                     setShapes(_shapes);
                   }}
-                  onRemove={() => removeShape(shape.id)}
+                  onRemove={() => {
+                    if (shape.type !== "dot") removeShape(shape);
+                  }}
                 />
               </Group>
             ) : (
@@ -221,16 +220,33 @@ const Shapes = ({ baseImageUrl }) => {
                   <LineShape
                     key={i}
                     shapeProps={shape}
-                    isSelected={shape.id === selectedId}
-                    onSelect={() => {
-                      selectShape(shape.id);
-                    }}
                     onChange={newAttrs => {
                       const _shapes = shapes.slice();
+
+                      _shapes[i].points.map((item, index) => {
+                        if (index % 2 === 0) {
+                          _shapes[i].points[index] = item + newAttrs.x;
+                        } else if (index % 2 === 1) {
+                          _shapes[i].points[index] = item + newAttrs.y;
+                        }
+                        return true;
+                      });
+                      _shapes.map(item => {
+                        if (item.type === "dot") {
+                          item.x = item.x + newAttrs.x;
+                          item.y = item.y + newAttrs.y;
+                        }
+                        return true;
+                      });
+
+                      delete newAttrs.x;
+                      delete newAttrs.y;
                       _shapes[i] = newAttrs;
                       setShapes(_shapes);
                     }}
-                    onRemove={() => removeShape(shape.id)}
+                    onRemove={() => {
+                      removeShape(shape);
+                    }}
                   />
                 </Group>
               )

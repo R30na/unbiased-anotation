@@ -16,7 +16,6 @@ const LineShape = ({ shapeProps, isSelected, onSelect, onChange, onRemove }) => 
   return (
     <React.Fragment>
       <Line
-        onClick={onSelect}
         ref={shapeRef}
         {...shapeProps}
         draggable
@@ -26,29 +25,6 @@ const LineShape = ({ shapeProps, isSelected, onSelect, onChange, onRemove }) => 
             x: e.target.x(),
             y: e.target.y()
           });
-        }}
-        onTransformEnd={e => {
-          const node = shapeRef.current;
-          if (node.rotation() === shapeProps.rotation) {
-            // transformer is changing scale
-            // we will reset it back
-            node.scaleX(1);
-            node.scaleY(1);
-            onChange({
-              ...shapeProps,
-              x: node.x(),
-              y: node.y(),
-              width: node.width(),
-              height: node.height()
-            });
-          } else {
-            onChange({
-              ...shapeProps,
-              x: node.x(),
-              y: node.y(),
-              rotation: node.rotation()
-            });
-          }
         }}
         onDblClick={() => onRemove()}
       />
