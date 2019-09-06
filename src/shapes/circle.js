@@ -34,7 +34,7 @@ const CircleShape = ({ shapeProps, isSelected, onSelect, onChange, onRemove }) =
         }}
         onTransformEnd={e => {
           const node = shapeRef.current;
-          console.log(node.scaleX())
+          console.log(node.scaleX());
           if (node.rotation() === shapeProps.rotation) {
             // transformer is changing scale
             const scale = node.scaleX();
@@ -55,6 +55,7 @@ const CircleShape = ({ shapeProps, isSelected, onSelect, onChange, onRemove }) =
           }
         }}
         onDblClick={() => onRemove()}
+        onDblTap={() => onRemove()}
       />
       {isSelected && <Transformer ref={trRef} />}
     </React.Fragment>

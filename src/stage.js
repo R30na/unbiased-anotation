@@ -50,8 +50,8 @@ const Shapes = ({ baseImageUrl }) => {
     const date = Date.now();
     const rect = {
       type: "rectangle",
-      x: stageSize.w / 2 - stageSize.w * 0.1 - shapes.length * 10,
-      y: stageSize.h / 2 - stageSize.h * 0.1 - shapes.length * 10,
+      x: stageSize.w / 2 - stageSize.w * 0.1 + shapes.length * 10,
+      y: stageSize.h / 2 - stageSize.h * 0.1 + shapes.length * 10,
       width: stageSize.w * 0.1,
       height: stageSize.h * 0.1,
       stroke: "red",
@@ -68,8 +68,8 @@ const Shapes = ({ baseImageUrl }) => {
     const date = Date.now();
     const circle = {
       type: "circle",
-      x: stageSize.w / 2 - stageSize.w * 0.1 - shapes.length * 10,
-      y: stageSize.h / 2 - stageSize.h * 0.1 - shapes.length * 10,
+      x: stageSize.w / 2 - stageSize.w * 0.1 + shapes.length * 10,
+      y: stageSize.h / 2 - stageSize.h * 0.1 + shapes.length * 10,
       radius: stageSize.w * 0.05,
       stroke: "red",
       fill: "rgba(255,0,0,0.3)",
@@ -94,7 +94,7 @@ const Shapes = ({ baseImageUrl }) => {
       radius: 10,
       x,
       y,
-      stroke: "black",
+      stroke: "red",
       fill: "rgba(255,0,0,0.3)",
       id: "dot" + date,
       rotation: 0,
@@ -148,6 +148,13 @@ const Shapes = ({ baseImageUrl }) => {
             width={stageSize.w}
             height={stageSize.h}
             onMouseUp={e => {
+              selectShape(null);
+              if (LineDrawingMode) {
+                const position = e.target.parent.parent.getPointerPosition();
+                addDotsToLine(position.x, position.y);
+              }
+            }}
+            onTouchStart={e => {
               selectShape(null);
               if (LineDrawingMode) {
                 const position = e.target.parent.parent.getPointerPosition();
@@ -257,12 +264,12 @@ const Shapes = ({ baseImageUrl }) => {
       <div className="row my-3">
         <div className="col">
           <button className="btn btn-info" onClick={() => addRectangle()}>
-            <img src={squareButton} alt="square" style={{ width: "2rem" }} />
+            <img src={squareButton} alt="square" style={{ width: "1rem" }} />
           </button>
         </div>
         <div className="col">
           <button className="btn btn-info" onClick={() => addCircle()}>
-            <img src={circleButton} alt="circle" style={{ width: "2rem" }} />
+            <img src={circleButton} alt="circle" style={{ width: "1rem" }} />
           </button>
         </div>
         <div className="col">
@@ -271,17 +278,17 @@ const Shapes = ({ baseImageUrl }) => {
             style={LineDrawingMode ? { backgroundColor: "orange" } : null}
             onClick={() => lineDrawing()}
           >
-            <img src={polygonButton} alt="polygon" style={{ width: "2rem" }} />
+            <img src={polygonButton} alt="polygon" style={{ width: "1rem" }} />
           </button>
         </div>
         <div className="col">
           <button className="btn btn-info">
-            <img src={zoomInButton} alt="polygon" style={{ width: "2rem" }} />
+            <img src={zoomInButton} alt="polygon" style={{ width: "1rem" }} />
           </button>
         </div>
         <div className="col">
           <button className="btn btn-info">
-            <img src={zoomOutButton} alt="polygon" style={{ width: "2rem" }} />
+            <img src={zoomOutButton} alt="polygon" style={{ width: "1rem" }} />
           </button>
         </div>
         <div className="col">
@@ -291,7 +298,7 @@ const Shapes = ({ baseImageUrl }) => {
               window.confirm("Are you sure you want to dlete all the shapes?") && setShapes([])
             }
           >
-            <img src={closeButton} alt="polygon" style={{ width: "2rem" }} />
+            <img src={closeButton} alt="polygon" style={{ width: "1rem" }} />
           </button>
         </div>
       </div>

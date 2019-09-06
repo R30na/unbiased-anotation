@@ -54,6 +54,7 @@ const Rectangle = ({ shapeProps, isSelected, onSelect, onChange, onRemove }) => 
           }
         }}
         onDblClick={() => onRemove()}
+        onDblTap={()=>onRemove()}
       />
       {isSelected && <Transformer ref={trRef} />}
     </React.Fragment>
