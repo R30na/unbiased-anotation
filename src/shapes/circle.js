@@ -34,7 +34,6 @@ const CircleShape = ({ shapeProps, isSelected, onSelect, onChange, onRemove }) =
         }}
         onTransformEnd={e => {
           const node = shapeRef.current;
-          console.log(node.scaleX());
           if (node.rotation() === shapeProps.rotation) {
             // transformer is changing scale
             const scale = node.scaleX();

@@ -24,7 +24,7 @@ const Shapes = ({ baseImageUrl }) => {
     // console.log(stageSize);
     localStorage.setItem("shapes", JSON.stringify(shapes));
     // console.log(JSON.stringify(shapes, null, 1));
-  }, [shapes, stageSize]);
+  }, [shapes]);
 
   const [mainImage] = useImage(baseImageUrl);
 
@@ -227,30 +227,30 @@ const Shapes = ({ baseImageUrl }) => {
                   <LineShape
                     key={i}
                     shapeProps={shape}
-                    onChange={newAttrs => {
-                      const _shapes = shapes.slice();
+                    // onChange={newAttrs => {
+                    //   const _shapes = shapes.slice();
 
-                      _shapes[i].points.map((item, index) => {
-                        if (index % 2 === 0) {
-                          _shapes[i].points[index] = item + newAttrs.x;
-                        } else if (index % 2 === 1) {
-                          _shapes[i].points[index] = item + newAttrs.y;
-                        }
-                        return true;
-                      });
-                      _shapes.map(item => {
-                        if (item.type === "dot") {
-                          item.x = item.x + newAttrs.x;
-                          item.y = item.y + newAttrs.y;
-                        }
-                        return true;
-                      });
+                    //   _shapes[i].points.map((item, index) => {
+                    //     if (index % 2 === 0) {
+                    //       _shapes[i].points[index] = item + newAttrs.x;
+                    //     } else if (index % 2 === 1) {
+                    //       _shapes[i].points[index] = item + newAttrs.y;
+                    //     }
+                    //     return true;
+                    //   });
+                    //   _shapes.map(item => {
+                    //     if (item.type === "dot") {
+                    //       item.x = item.x + newAttrs.x;
+                    //       item.y = item.y + newAttrs.y;
+                    //     }
+                    //     return true;
+                    //   });
 
-                      delete newAttrs.x;
-                      delete newAttrs.y;
-                      _shapes[i] = newAttrs;
-                      setShapes(_shapes);
-                    }}
+                    //   delete newAttrs.x;
+                    //   delete newAttrs.y;
+                    //   _shapes[i] = newAttrs;
+                    //   setShapes(_shapes);
+                    // }}
                     onRemove={() => {
                       removeShape(shape);
                     }}
