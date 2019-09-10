@@ -20,7 +20,9 @@ import {
 const Shapes = ({ baseImageUrl }) => {
   const [shapes, setShapes] = useState([]);
   const [history, setHistory] = useState([[]]);
-  const [currentHistoryIndex, setCurrentHistoryIndex] = useState(history.length - 1);
+  const [currentHistoryIndex, setCurrentHistoryIndex] = useState(
+    history.length - 1
+  );
   const [lineDrawingMode, setLineDrawingMode] = useState(false);
   const [closedMode, setClosedMode] = useState(false);
   const [currentLine, setCurrentline] = useState("");
@@ -34,27 +36,36 @@ const Shapes = ({ baseImageUrl }) => {
   useEffect(() => {
     const _shapes = JSON.parse(localStorage.getItem("shapes"));
     const _history = JSON.parse(localStorage.getItem("history"));
-    const _currentHistoryIndex = JSON.parse(localStorage.getItem("currentHistoryIndex"));
+    const _currentHistoryIndex = JSON.parse(
+      localStorage.getItem("currentHistoryIndex")
+    );
     setShapes(_shapes);
     setHistory(_history);
     setCurrentHistoryIndex(_currentHistoryIndex);
-    setStageSize({ w: stageParentRef.current.clientWidth, h: stageParentRef.current.clientHeight });
+    setStageSize({
+      w: stageParentRef.current.clientWidth,
+      h: stageParentRef.current.clientHeight
+    });
   }, []);
 
   useEffect(() => {
     localStorage.setItem("shapes", JSON.stringify(shapes));
     localStorage.setItem("history", JSON.stringify(history));
-    localStorage.setItem("currentHistoryIndex", JSON.stringify(currentHistoryIndex));
-    console.log(shapes);
+    localStorage.setItem(
+      "currentHistoryIndex",
+      JSON.stringify(currentHistoryIndex)
+    );
+    console.log(history, currentHistoryIndex);
   }, [shapes]);
 
   const [mainImage] = useImage(baseImageUrl);
 
   const addToHistory = shapesToAdd => {
-    // const _history = [...history];
-    // _history.push(shapesToAdd);
-    // setHistory(_history);
-    // setCurrentHistoryIndex(history.length);
+    const _history = [...history];
+    console.log(_history);
+    _history.push(shapesToAdd);
+    setHistory(_history);
+    setCurrentHistoryIndex(history.length);
   };
 
   const addRectangle = () => {
@@ -120,10 +131,15 @@ const Shapes = ({ baseImageUrl }) => {
     addToHistory(_shapes);
 
     if (index !== -1) {
-      _shapes[index].points.push(x, y);
+      ////////////////////////////////
+      const _points = [..._shapes[index].points];
+      const _shape = { ..._shapes[index], points: [] };
+      _points.push(x, y);
+      _shape.points = _points;
+      _shapes[index] = _shape;
       setShapes(_shapes);
       addToHistory(_shapes);
-
+      ////////////////////////////////
       selectShape(_shapes[index].id);
       selectShape(null);
     } else if (index === -1) {
@@ -152,7 +168,9 @@ const Shapes = ({ baseImageUrl }) => {
       addToHistory(_shapes);
     } else if (index !== -1 && shapeToDelete.type === "line") {
       _shapes.splice(index, 1);
-      const _filtered = _shapes.filter(item => item.parentId !== shapeToDelete.id);
+      const _filtered = _shapes.filter(
+        item => item.parentId !== shapeToDelete.id
+      );
       setShapes(_filtered);
       addToHistory(_filtered);
     }
@@ -176,7 +194,10 @@ const Shapes = ({ baseImageUrl }) => {
   };
 
   return (
-    <div style={{ flex: 1, width: "100%", height: "100%" }} ref={stageParentRef}>
+    <div
+      style={{ flex: 1, width: "100%", height: "100%" }}
+      ref={stageParentRef}
+    >
       <Stage width={stageSize.w} height={stageSize.h}>
         <Layer
           x={stagePosition.x}
@@ -203,7 +224,11 @@ const Shapes = ({ baseImageUrl }) => {
             }
           }}
           onDragEnd={e => {
-            if (e.target.attrs.type !== "circle" && e.target.attrs.type !== "rectangle") {
+            if (
+              e.target.attrs.type !== "circle" &&
+              e.target.attrs.type !== "rectangle" &&
+              e.target.attrs.type !== "dot"
+            ) {
               setStagePosition({
                 x: e.target.attrs.x,
                 y: e.target.attrs.y
@@ -240,11 +265,15 @@ const Shapes = ({ baseImageUrl }) => {
                     if (shape.type !== "dot") selectShape(shape.id);
                   }}
                   onChange={newAttrs => {
-                    if (newAttrs.type === "dot" && newAttrs.eventType === "dragend") {
+                    if (
+                      newAttrs.type === "dot" &&
+                      newAttrs.eventType === "dragend"
+                    ) {
                       const _shapesArray = [...shapes];
                       const index = _shapesArray.findIndex(
                         item =>
-                          item.type === "line" && item.points.includes(newAttrs.previousPosition.x)
+                          item.type === "line" &&
+                          item.points.includes(newAttrs.previousPosition.x)
                       );
                       if (index !== -1) {
                         const foundPoint = _shapesArray[index];
@@ -253,7 +282,8 @@ const Shapes = ({ baseImageUrl }) => {
                         );
                         if (
                           xIndex !== -1 &&
-                          foundPoint.points[xIndex + 1] === newAttrs.previousPosition.y
+                          foundPoint.points[xIndex + 1] ===
+                            newAttrs.previousPosition.y
                         ) {
                           _shapesArray[index].points[xIndex] = newAttrs.x;
                           _shapesArray[index].points[xIndex + 1] = newAttrs.y;
@@ -303,7 +333,11 @@ const Shapes = ({ baseImageUrl }) => {
         <div className="col">
           <button
             className="btn btn-info"
-            style={lineDrawingMode && closedMode ? { backgroundColor: "orange" } : null}
+            style={
+              lineDrawingMode && closedMode
+                ? { backgroundColor: "orange" }
+                : null
+            }
             onClick={() => lineDrawing(true)}
           >
             <img src={polygonButton} alt="polygon" style={{ width: "1rem" }} />
@@ -312,19 +346,29 @@ const Shapes = ({ baseImageUrl }) => {
         <div className="col">
           <button
             className="btn btn-info"
-            style={lineDrawingMode && !closedMode ? { backgroundColor: "orange" } : null}
+            style={
+              lineDrawingMode && !closedMode
+                ? { backgroundColor: "orange" }
+                : null
+            }
             onClick={() => lineDrawing(false)}
           >
             <img src={linesButton} alt="polygon" style={{ width: "1rem" }} />
           </button>
         </div>
         <div className="col">
-          <button className="btn btn-info" onClick={() => setStageScale(stageScale * 1.3)}>
+          <button
+            className="btn btn-info"
+            onClick={() => setStageScale(stageScale * 1.3)}
+          >
             <img src={zoomInButton} alt="polygon" style={{ width: "1rem" }} />
           </button>
         </div>
         <div className="col">
-          <button className="btn btn-info" onClick={() => setStageScale(stageScale * 0.85)}>
+          <button
+            className="btn btn-info"
+            onClick={() => setStageScale(stageScale * 0.85)}
+          >
             <img src={zoomOutButton} alt="polygon" style={{ width: "1rem" }} />
           </button>
         </div>
@@ -351,7 +395,9 @@ const Shapes = ({ baseImageUrl }) => {
         <div className="col">
           <button
             className="btn btn-info"
-            disabled={currentHistoryIndex === history.length - 1 || history.length < 1}
+            disabled={
+              currentHistoryIndex === history.length - 1 || history.length < 1
+            }
             onClick={() => redo()}
           >
             <img src={redoButton} alt="polygon" style={{ width: "1rem" }} />
@@ -361,7 +407,9 @@ const Shapes = ({ baseImageUrl }) => {
           <button
             className="btn btn-info"
             onClick={() =>
-              window.confirm("Are you sure you want to dlete all the shapes?") && removeAllShapes()
+              window.confirm(
+                "Are you sure you want to dlete all the shapes?"
+              ) && removeAllShapes()
             }
           >
             <img src={closeButton} alt="polygon" style={{ width: "1rem" }} />
@@ -372,10 +420,12 @@ const Shapes = ({ baseImageUrl }) => {
         <div className="col" style={{ color: "gray" }}>
           <h6>Double tap on a shape to remove</h6>
           <h6>
-            Tap on a <b>Circle</b> or <b>Rectangle</b> to <b>resize</b> or <b>rotate</b>
+            Tap on a <b>Circle</b> or <b>Rectangle</b> to <b>resize</b> or{" "}
+            <b>rotate</b>
           </h6>
           <h6>
-            You can not <b>drag</b> the Stage when drawing a <b>Polygon</b> or <b>Line</b>
+            You can not <b>drag</b> the Stage when drawing a <b>Polygon</b> or{" "}
+            <b>Line</b>
           </h6>
         </div>
       </div>
