@@ -18,7 +18,6 @@ const LineShape = ({ shapeProps, isSelected, onSelect, onChange, onRemove }) => 
       <Line
         ref={shapeRef}
         {...shapeProps}
-        // draggable
         onDragEnd={e => {
           onChange({
             ...shapeProps,

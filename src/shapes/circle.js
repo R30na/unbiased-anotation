@@ -17,6 +17,7 @@ const CircleShape = ({ shapeProps, isSelected, onSelect, onChange, onRemove }) =
     <React.Fragment>
       <Circle
         onClick={onSelect}
+        onTap={onSelect}
         ref={shapeRef}
         {...shapeProps}
         draggable
