@@ -49,7 +49,6 @@ const Shapes = ({ baseImageUrl }) => {
 
   const addToHistory = shapesToAdd => {
     const _history = [...history];
-    console.log(_history);
     _history.push(shapesToAdd);
     setHistory(_history);
     setCurrentHistoryIndex(history.length);
