@@ -19,6 +19,7 @@ import {
 
 const Shapes = ({ baseImageUrl }) => {
   const [shapes, setShapes] = useState([]);
+  const [color, setColor] = useState("#ff0000");
   const [history, setHistory] = useState([[]]);
   const [currentHistoryIndex, setCurrentHistoryIndex] = useState(history.length - 1);
   const [lineDrawingMode, setLineDrawingMode] = useState(false);
@@ -62,8 +63,8 @@ const Shapes = ({ baseImageUrl }) => {
       y: stageSize.h / 2 - stageSize.h * 0.1 + shapes.length * 10,
       width: stageSize.w * 0.1,
       height: stageSize.h * 0.1,
-      stroke: "red",
-      fill: "rgba(255,0,0,0.3)",
+      stroke: color,
+      fill: hexToRgba(color),
       id: "rect" + date,
       rotation: 0
     };
@@ -80,8 +81,8 @@ const Shapes = ({ baseImageUrl }) => {
       x: stageSize.w / 2 - stageSize.w * 0.1 + shapes.length * 10,
       y: stageSize.h / 2 - stageSize.h * 0.1 + shapes.length * 10,
       radius: stageSize.w * 0.05,
-      stroke: "red",
-      fill: "rgba(255,0,0,0.3)",
+      stroke: color,
+      fill: hexToRgba(color),
       id: "circle" + date,
       rotation: 0
     };
@@ -105,8 +106,8 @@ const Shapes = ({ baseImageUrl }) => {
       radius: 3,
       x,
       y,
-      stroke: "red",
-      fill: "rgba(255,0,0,0.8)",
+      stroke: color,
+      fill: hexToRgba(color),
       id: "dot" + date,
       rotation: 0,
       parentId: currentLine
@@ -133,8 +134,8 @@ const Shapes = ({ baseImageUrl }) => {
         type: "line",
         closed: closedMode,
         points: [x, y],
-        stroke: "red",
-        fill: "rgba(255,0,0,0.3)",
+        stroke: color,
+        fill: hexToRgba(color),
         tension: 0,
         id: currentLine,
         rotation: 0
@@ -177,13 +178,22 @@ const Shapes = ({ baseImageUrl }) => {
     addToHistory([]);
   };
 
+  const hexToRgba = str => {
+    if (/^#([0-9a-f]{3}|[0-9a-f]{6})$/gi.test(str)) {
+      var hex = str.substr(1);
+      hex = hex.length === 3 ? hex.replace(/(.)/g, "$1$1") : hex;
+      var rgb = parseInt(hex, 16);
+      return "rgba(" + [(rgb >> 16) & 255, (rgb >> 8) & 255, rgb & 255].join(",") + ",0.3)";
+    }
+    return false;
+  };
+
   return (
     <div style={{ flex: 1, width: "100%", height: "100%" }} ref={stageParentRef}>
       <Stage width={stageSize.w} height={stageSize.h}>
         <Layer
           x={stagePosition.x}
           y={stagePosition.y}
-          stroke="red"
           draggable={!lineDrawingMode}
           scaleX={stageScale}
           scaleY={stageScale}
@@ -296,17 +306,17 @@ const Shapes = ({ baseImageUrl }) => {
         </Layer>
       </Stage>
       <div className="row my-3">
-        <div className="col">
+        <div className="col m-0 p-0">
           <button className="btn btn-info" onClick={() => addRectangle()}>
             <img src={squareButton} alt="square" style={{ width: "1rem" }} />
           </button>
         </div>
-        <div className="col">
+        <div className="col m-0 p-0">
           <button className="btn btn-info" onClick={() => addCircle()}>
             <img src={circleButton} alt="circle" style={{ width: "1rem" }} />
           </button>
         </div>
-        <div className="col">
+        <div className="col m-0 p-0">
           <button
             className="btn btn-info"
             style={lineDrawingMode && closedMode ? { backgroundColor: "orange" } : null}
@@ -315,7 +325,7 @@ const Shapes = ({ baseImageUrl }) => {
             <img src={polygonButton} alt="polygon" style={{ width: "1rem" }} />
           </button>
         </div>
-        <div className="col">
+        <div className="col m-0 p-0">
           <button
             className="btn btn-info"
             style={lineDrawingMode && !closedMode ? { backgroundColor: "orange" } : null}
@@ -324,17 +334,27 @@ const Shapes = ({ baseImageUrl }) => {
             <img src={linesButton} alt="polygon" style={{ width: "1rem" }} />
           </button>
         </div>
-        <div className="col">
+        <div className="col m-0 p-0">
           <button className="btn btn-info" onClick={() => setStageScale(stageScale * 1.3)}>
             <img src={zoomInButton} alt="polygon" style={{ width: "1rem" }} />
           </button>
         </div>
-        <div className="col">
+        <div className="col m-0 p-0">
           <button className="btn btn-info" onClick={() => setStageScale(stageScale * 0.85)}>
             <img src={zoomOutButton} alt="polygon" style={{ width: "1rem" }} />
           </button>
         </div>
-        <div className="col">
+        <div className="col p-0 m-0">
+          <button className="btn btn-info">
+            <input
+              type="color"
+              className="colorPicker"
+              value={color}
+              onChange={e => setColor(e.target.value)}
+            />
+          </button>
+        </div>
+        <div className="col m-0 p-0">
           <button
             className="btn btn-info"
             onClick={() => {
@@ -345,7 +365,7 @@ const Shapes = ({ baseImageUrl }) => {
             <img src={maximizeButton} alt="polygon" style={{ width: "1rem" }} />
           </button>
         </div>
-        <div className="col">
+        <div className="col m-0 p-0">
           <button
             className="btn btn-info"
             disabled={currentHistoryIndex === 0 || history.length < 1}
@@ -354,7 +374,7 @@ const Shapes = ({ baseImageUrl }) => {
             <img src={undoButton} alt="polygon" style={{ width: "1rem" }} />
           </button>
         </div>
-        <div className="col">
+        <div className="col m-0 p-0">
           <button
             className="btn btn-info"
             disabled={currentHistoryIndex === history.length - 1 || history.length < 1}
@@ -363,7 +383,7 @@ const Shapes = ({ baseImageUrl }) => {
             <img src={redoButton} alt="polygon" style={{ width: "1rem" }} />
           </button>
         </div>
-        <div className="col">
+        <div className="col m-0 p-0">
           <button
             className="btn btn-info"
             onClick={() =>
@@ -375,7 +395,7 @@ const Shapes = ({ baseImageUrl }) => {
         </div>
       </div>
       <div className="row">
-        <div className="col" style={{ color: "gray" }}>
+        <div className="col m-0 p-0" style={{ color: "gray" }}>
           <h6>Double tap on a shape to remove</h6>
           <h6>
             Tap on a <b>Circle</b> or <b>Rectangle</b> to <b>resize</b> or <b>rotate</b>
