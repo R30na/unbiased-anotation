@@ -42,7 +42,7 @@ const Shapes = ({ baseImageUrl }) => {
 
   useEffect(() => {
     localStorage.setItem("shapes", JSON.stringify(shapes));
-    console.log(history, currentHistoryIndex);
+    // console.log(history, currentHistoryIndex);
   }, [shapes]);
 
   const [mainImage] = useImage(baseImageUrl);
