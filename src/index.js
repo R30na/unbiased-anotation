@@ -14,7 +14,7 @@ const mainImage2 = "https://www.easyhdr.com/examples/notredame/notredame.jpg";
 
 function App() {
   return (
-    <div className="App">
+    <div className="App m-3">
       <Shapes baseImageUrl={mainImage1} />
     </div>
   );
