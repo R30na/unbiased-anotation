@@ -29,6 +29,7 @@ const Shapes = ({ baseImageUrl }) => {
   const [stageSize, setStageSize] = useState({ w: 0, h: 0 });
   const [stageScale, setStageScale] = useState(1);
   const [stagePosition, setStagePosition] = useState({ x: 0, y: 0 });
+  const [stageDragged, setStageDragged] = useState(true);
 
   const stageParentRef = React.createRef();
 
@@ -176,6 +177,7 @@ const Shapes = ({ baseImageUrl }) => {
   const removeAllShapes = () => {
     setShapes([]);
     addToHistory([]);
+    setLineDrawingMode(false);
   };
 
   const hexToRgba = str => {
@@ -194,12 +196,12 @@ const Shapes = ({ baseImageUrl }) => {
         <Layer
           x={stagePosition.x}
           y={stagePosition.y}
-          draggable={!lineDrawingMode}
+          draggable
           scaleX={stageScale}
           scaleY={stageScale}
           onMouseUp={e => {
             selectShape(null);
-            if (lineDrawingMode) {
+            if (lineDrawingMode && !stageDragged) {
               const position = e.target.parent.parent.getPointerPosition();
               addDotsToLine(
                 (position.x - stagePosition.x) / stageScale,
@@ -214,6 +216,7 @@ const Shapes = ({ baseImageUrl }) => {
               addDotsToLine(position.x, position.y);
             }
           }}
+          onDragStart={() => setStageDragged(true)}
           onDragEnd={e => {
             if (
               e.target.attrs.type !== "circle" &&
@@ -225,6 +228,7 @@ const Shapes = ({ baseImageUrl }) => {
                 y: e.target.attrs.y
               });
             }
+            setStageDragged(false);
           }}
         >
           <Image image={mainImage} width={stageSize.w} height={stageSize.h} />
@@ -331,17 +335,17 @@ const Shapes = ({ baseImageUrl }) => {
             style={lineDrawingMode && !closedMode ? { backgroundColor: "orange" } : null}
             onClick={() => lineDrawing(false)}
           >
-            <img src={linesButton} alt="polygon" style={{ width: "1rem" }} />
+            <img src={linesButton} alt="line" style={{ width: "1rem" }} />
           </button>
         </div>
         <div className="col m-0 p-0">
           <button className="btn btn-info" onClick={() => setStageScale(stageScale * 1.3)}>
-            <img src={zoomInButton} alt="polygon" style={{ width: "1rem" }} />
+            <img src={zoomInButton} alt="zoom in" style={{ width: "1rem" }} />
           </button>
         </div>
         <div className="col m-0 p-0">
           <button className="btn btn-info" onClick={() => setStageScale(stageScale * 0.85)}>
-            <img src={zoomOutButton} alt="polygon" style={{ width: "1rem" }} />
+            <img src={zoomOutButton} alt="zoom out" style={{ width: "1rem" }} />
           </button>
         </div>
         <div className="col p-0 m-0">
@@ -362,7 +366,7 @@ const Shapes = ({ baseImageUrl }) => {
               setStagePosition({ x: 0, y: 0 });
             }}
           >
-            <img src={maximizeButton} alt="polygon" style={{ width: "1rem" }} />
+            <img src={maximizeButton} alt="maximize" style={{ width: "1rem" }} />
           </button>
         </div>
         <div className="col m-0 p-0">
@@ -371,7 +375,7 @@ const Shapes = ({ baseImageUrl }) => {
             disabled={currentHistoryIndex === 0 || history.length < 1}
             onClick={() => undo()}
           >
-            <img src={undoButton} alt="polygon" style={{ width: "1rem" }} />
+            <img src={undoButton} alt="undo" style={{ width: "1rem" }} />
           </button>
         </div>
         <div className="col m-0 p-0">
@@ -380,7 +384,7 @@ const Shapes = ({ baseImageUrl }) => {
             disabled={currentHistoryIndex === history.length - 1 || history.length < 1}
             onClick={() => redo()}
           >
-            <img src={redoButton} alt="polygon" style={{ width: "1rem" }} />
+            <img src={redoButton} alt="redo" style={{ width: "1rem" }} />
           </button>
         </div>
         <div className="col m-0 p-0">
@@ -390,7 +394,7 @@ const Shapes = ({ baseImageUrl }) => {
               window.confirm("Are you sure you want to dlete all the shapes?") && removeAllShapes()
             }
           >
-            <img src={closeButton} alt="polygon" style={{ width: "1rem" }} />
+            <img src={closeButton} alt="clear all" style={{ width: "1rem" }} />
           </button>
         </div>
       </div>
