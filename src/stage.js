@@ -44,7 +44,6 @@ const Shapes = ({ baseImageUrl }) => {
 
   useEffect(() => {
     localStorage.setItem("shapes", JSON.stringify(shapes));
-    // console.log(history, currentHistoryIndex);
   }, [shapes]);
 
   const [mainImage] = useImage(baseImageUrl);
@@ -403,9 +402,6 @@ const Shapes = ({ baseImageUrl }) => {
           <h6>Double tap on a shape to remove</h6>
           <h6>
             Tap on a <b>Circle</b> or <b>Rectangle</b> to <b>resize</b> or <b>rotate</b>
-          </h6>
-          <h6>
-            You can not <b>drag</b> the Stage when drawing a <b>Polygon</b> or <b>Line</b>
           </h6>
         </div>
       </div>

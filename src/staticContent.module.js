@@ -1,3 +1,11 @@
+export const mainImage =
+  "https://www.autocar.co.uk/sites/autocar.co.uk/files/styles/gallery_slide/public/images/car-reviews/first-drives/legacy/large-2479-s-classsaloon.jpg";
+
+export const mainImage1 =
+  "https://www.twentyonepilots.com/sites/g/files/g2000004896/f/Sample-image10-highres.jpg";
+
+export const mainImage2 = "https://www.easyhdr.com/examples/notredame/notredame.jpg";
+
 export const squareButton =
   "https://firebasestorage.googleapis.com/v0/b/data-marketplace-bb1fa.appspot.com/o/staticImages%2Fproject%2Fsquare.svg?alt=media&token=524f916a-1e3c-4acd-a988-695581af1a47";
 
