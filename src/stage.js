@@ -212,10 +212,9 @@ const Shapes = ({ baseImageUrl }) => {
             selectShape(null);
             if (lineDrawingMode && !stageDragged) {
               const position = e.evt.changedTouches[0];
-              console.log(position);
               addDotsToLine(
-                (position.clientX - stagePosition.x) / stageScale,
-                (position.clientY - stagePosition.y) / stageScale
+                (position.clientX - stagePosition.x - 15) / stageScale,
+                (position.clientY - stagePosition.y - 15) / stageScale
               );
             }
           }}
@@ -237,80 +236,82 @@ const Shapes = ({ baseImageUrl }) => {
         >
           <Image image={mainImage} width={stageSize.w} height={stageSize.h} />
 
-          {shapes.map((shape, i) =>
-            shape.type === "rectangle" ? (
-              <Group key={i}>
-                <Rectangle
-                  shapeProps={shape}
-                  isSelected={shape.id === selectedId}
-                  onSelect={() => {
-                    selectShape(shape.id);
-                  }}
-                  onChange={newAttrs => {
-                    const _shapes = shapes.slice();
-                    _shapes[i] = newAttrs;
-                    setShapes(_shapes);
-                    addToHistory(_shapes);
-                  }}
-                  onRemove={() => removeShape(shape)}
-                />
-              </Group>
-            ) : shape.type === "circle" || shape.type === "dot" ? (
-              <Group key={i}>
-                <CircleShape
-                  shapeProps={shape}
-                  isSelected={shape.id === selectedId}
-                  onSelect={() => {
-                    if (shape.type !== "dot") selectShape(shape.id);
-                  }}
-                  onChange={newAttrs => {
-                    if (newAttrs.type === "dot" && newAttrs.eventType === "dragend") {
-                      const _shapesArray = [...shapes];
-                      const index = _shapesArray.findIndex(
-                        item =>
-                          item.type === "line" && item.points.includes(newAttrs.previousPosition.x)
-                      );
-                      if (index !== -1) {
-                        const foundPoint = _shapesArray[index];
-                        const xIndex = foundPoint.points.findIndex(
-                          item => item === newAttrs.previousPosition.x
+          {shapes.length > 0 &&
+            shapes.map((shape, i) =>
+              shape.type === "rectangle" ? (
+                <Group key={i}>
+                  <Rectangle
+                    shapeProps={shape}
+                    isSelected={shape.id === selectedId}
+                    onSelect={() => {
+                      selectShape(shape.id);
+                    }}
+                    onChange={newAttrs => {
+                      const _shapes = shapes.slice();
+                      _shapes[i] = newAttrs;
+                      setShapes(_shapes);
+                      addToHistory(_shapes);
+                    }}
+                    onRemove={() => removeShape(shape)}
+                  />
+                </Group>
+              ) : shape.type === "circle" || shape.type === "dot" ? (
+                <Group key={i}>
+                  <CircleShape
+                    shapeProps={shape}
+                    isSelected={shape.id === selectedId}
+                    onSelect={() => {
+                      if (shape.type !== "dot") selectShape(shape.id);
+                    }}
+                    onChange={newAttrs => {
+                      if (newAttrs.type === "dot" && newAttrs.eventType === "dragend") {
+                        const _shapesArray = [...shapes];
+                        const index = _shapesArray.findIndex(
+                          item =>
+                            item.type === "line" &&
+                            item.points.includes(newAttrs.previousPosition.x)
                         );
-                        if (
-                          xIndex !== -1 &&
-                          foundPoint.points[xIndex + 1] === newAttrs.previousPosition.y
-                        ) {
-                          _shapesArray[index].points[xIndex] = newAttrs.x;
-                          _shapesArray[index].points[xIndex + 1] = newAttrs.y;
-                          setShapes(_shapesArray);
-                          addToHistory(_shapesArray);
+                        if (index !== -1) {
+                          const foundPoint = _shapesArray[index];
+                          const xIndex = foundPoint.points.findIndex(
+                            item => item === newAttrs.previousPosition.x
+                          );
+                          if (
+                            xIndex !== -1 &&
+                            foundPoint.points[xIndex + 1] === newAttrs.previousPosition.y
+                          ) {
+                            _shapesArray[index].points[xIndex] = newAttrs.x;
+                            _shapesArray[index].points[xIndex + 1] = newAttrs.y;
+                            setShapes(_shapesArray);
+                            addToHistory(_shapesArray);
+                          }
                         }
                       }
-                    }
-                    const _shapes = shapes.slice();
-                    delete newAttrs.previousPosition;
-                    _shapes[i] = newAttrs;
-                    setShapes(_shapes);
-                    addToHistory(_shapes);
-                  }}
-                  onRemove={() => {
-                    if (shape.type !== "dot") removeShape(shape);
-                  }}
-                />
-              </Group>
-            ) : (
-              shape.type === "line" && (
-                <Group key={i}>
-                  <LineShape
-                    key={i}
-                    shapeProps={shape}
+                      const _shapes = shapes.slice();
+                      delete newAttrs.previousPosition;
+                      _shapes[i] = newAttrs;
+                      setShapes(_shapes);
+                      addToHistory(_shapes);
+                    }}
                     onRemove={() => {
-                      removeShape(shape);
+                      if (shape.type !== "dot") removeShape(shape);
                     }}
                   />
                 </Group>
+              ) : (
+                shape.type === "line" && (
+                  <Group key={i}>
+                    <LineShape
+                      key={i}
+                      shapeProps={shape}
+                      onRemove={() => {
+                        removeShape(shape);
+                      }}
+                    />
+                  </Group>
+                )
               )
-            )
-          )}
+            )}
         </Layer>
       </Stage>
       <div className="row my-3">
