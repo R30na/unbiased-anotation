@@ -29,7 +29,7 @@ const Shapes = ({ baseImageUrl }) => {
   const [stageSize, setStageSize] = useState({ w: 0, h: 0 });
   const [stageScale, setStageScale] = useState(1);
   const [stagePosition, setStagePosition] = useState({ x: 0, y: 0 });
-  const [stageDragged, setStageDragged] = useState(true);
+  const [stageDragged, setStageDragged] = useState(false);
 
   const stageParentRef = React.createRef();
 
@@ -208,14 +208,19 @@ const Shapes = ({ baseImageUrl }) => {
               );
             }
           }}
-          onTouchStart={e => {
+          onTouchEnd={e => {
             selectShape(null);
-            if (lineDrawingMode) {
-              const position = e.target.parent.parent.getPointerPosition();
-              addDotsToLine(position.x, position.y);
+            if (lineDrawingMode && !stageDragged) {
+              const position = e.evt.changedTouches[0];
+              console.log(position);
+              addDotsToLine(
+                (position.clientX - stagePosition.x) / stageScale,
+                (position.clientY - stagePosition.y) / stageScale
+              );
             }
           }}
           onDragStart={() => setStageDragged(true)}
+          onTouchMove={() => setStageDragged(true)}
           onDragEnd={e => {
             if (
               e.target.attrs.type !== "circle" &&
